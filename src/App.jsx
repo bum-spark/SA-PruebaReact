@@ -34,16 +34,20 @@ function App() {
 
   const [data, setData] = useState(db);
 
-  console.log(data);
+  //xconsole.log(data);
 
   /*useEffect( ()=> {
     setData(db)
   }, [] );*/
   //Al momento que el db cambie, se va a ejecutar el useEffect
 
+  const [cart, setCart] = useState([]);
+
   return (
     <div>
-      <Header/>
+      <Header 
+        guigui={cart}  
+      />
 
       <main className="container-xl mt-5">
         <h2 className="text-center">Nuestra Colección</h2>
@@ -54,6 +58,8 @@ function App() {
               <Card
                 key={guitar.id}
                 guitar={guitar}
+                cart={cart}
+                setCart={setCart}
               />
             ) 
           )}

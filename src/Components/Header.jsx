@@ -1,13 +1,18 @@
 import React from 'react'
+import Item from './item.jsx'
 
-export default function Header() {
+export default function Header({ guigui }) {
 //logic here
 
 //const name = "Juan";
 
 
-//structure here
+//crear components item
+//con para metros {cart} = img, nombre y precio
+console.log(guigui);
+
   return (
+
     <>
       <header className="py-5 header">
         <div className="container-xl">
@@ -42,30 +47,16 @@ export default function Header() {
                       </tr>
                     </thead>
                     <tbody>
+                      {guigui.map( guitarc => (
+                        <Item 
+                          key={guitarc.id}
+                          img={guitarc.image}
+                          nombre={guitarc.name}
+                          precio={guitarc.price}
+                        />
+                      ))}
                       <tr>
-                        <td>
-                          <img
-                            className="img-fluid"
-                            src="./public/img/guitarra_02.jpg"
-                            alt="imagen guitarra"
-                          />
-                        </td>
-                        <td>SRV</td>
-                        <td className="fw-bold">$299</td>
-                        <td className="flex align-items-start gap-4">
-                          <button type="button" className="btn btn-dark">
-                            -
-                          </button>
-                          1
-                          <button type="button" className="btn btn-dark">
-                            +
-                          </button>
-                        </td>
-                        <td>
-                          <button className="btn btn-danger" type="button">
-                            X
-                          </button>
-                        </td>
+                        
                       </tr>
                     </tbody>
                   </table>

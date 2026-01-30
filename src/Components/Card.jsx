@@ -1,8 +1,17 @@
 import React from 'react'
 
-export default function Card({guitar}) {
+export default function Card({guitar, cart, setCart}) {
 
     const imagePath = "img/" + guitar.image + ".jpg";
+
+    /*const handleClick = (name) => {
+        console.log( `Guitarra ${name} agregada al carrito.` );
+    }*/
+
+    const handleClick = (item) => {
+        console.log(item);
+        setCart([...cart, item ]);
+    }
 
   return (
             <div className="col-md-6 col-lg-4 my-4 row align-items-center">
@@ -16,6 +25,7 @@ export default function Card({guitar}) {
                     <button 
                         type="button"
                         className="btn btn-dark w-100"
+                        onClick={() => handleClick(guitar)}
                     >Agregar al Carrito</button>
                 </div>
             </div>
