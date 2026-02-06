@@ -7,7 +7,7 @@ import './App.css'
 //useState: Una variable va a estar renderizando cuando se utilice su metodo
 //useEffect: esperar un resultado y luego utilizar las variables
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { db } from './db/db.js'
 
 
@@ -43,10 +43,48 @@ function App() {
 
   const [cart, setCart] = useState([]);
 
+  const aumentarCantidad = (id) => {
+    const updatedCart = cart.map(item => {
+      if (item.id === id) {
+        return { ...item, quantity: item.quantity + 1 };
+      }
+      return item;
+    });
+    setCart(updatedCart);
+  };
+
+  const quitarCantidad = (id) => {
+    const item = cart.find(item => item.id === id);
+    if (item.quantity === 1) {
+      quitarDelCarro(id);
+    } else {
+      const updatedCart = cart.map(item => {
+        if (item.id === id) {
+          return { ...item, quantity: item.quantity - 1 };
+        }
+        return item;
+      });
+      setCart(updatedCart);
+    }
+  };
+
+  const quitarDelCarro = (id) => {
+    const updatedCart = cart.filter(item => item.id !== id);
+    setCart(updatedCart);
+  };
+
+  const vaciarElCarro = () => {
+    setCart([]);
+  };
+
   return (
     <div>
       <Header 
-        guigui={cart}  
+        guigui={cart}
+        aumentarCantidad={aumentarCantidad}
+        quitarCantidad={quitarCantidad}
+        quitarDelCarro={quitarDelCarro}
+        vaciarElCarro={vaciarElCarro}
       />
 
       <main className="container-xl mt-5">

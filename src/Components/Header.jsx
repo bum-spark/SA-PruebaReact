@@ -1,7 +1,7 @@
 import React from 'react'
 import Item from './item.jsx'
 
-export default function Header({ guigui }) {
+export default function Header({ guigui, aumentarCantidad, quitarCantidad, quitarDelCarro, vaciarElCarro }) {
 //logic here
 
 //const name = "Juan";
@@ -10,6 +10,12 @@ export default function Header({ guigui }) {
 //crear components item
 //con para metros {cart} = img, nombre y precio
 console.log(guigui);
+
+  const isEmpty = () => guigui.length === 0;
+
+  const cartTotal = () => {
+    return guigui.reduce((total, item) => total + (item.price * item.quantity ), 0);
+  }
 
   return (
 
@@ -35,38 +41,49 @@ console.log(guigui);
                 />
 
                 <div id="carrito" className="bg-white p-3">
-                  <p className="text-center">El carrito esta vacio</p>
-                  <table className="w-100 table">
-                    <thead>
-                      <tr>
-                        <th>Imagen</th>
-                        <th>Nombre</th>
-                        <th>Precio</th>
-                        <th>Cantidad</th>
-                        <th></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {guigui.map( guitarc => (
-                        <Item 
-                          key={guitarc.id}
-                          img={guitarc.image}
-                          nombre={guitarc.name}
-                          precio={guitarc.price}
-                        />
-                      ))}
-                      <tr>
-                        
-                      </tr>
-                    </tbody>
-                  </table>
+                  { isEmpty() ? (
+                    <p className="text-center">El carrito esta vacio</p>
+                  ) : (
+                  <>
+                    <table className="w-100 table">
+                      <thead>
+                        <tr>
+                          <th>Imagen</th>
+                          <th>Nombre</th>
+                          <th>Precio</th>
+                          <th>Cantidad</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {guigui.map( guitarc => (
+                          <Item 
+                            key={guitarc.id}
+                            id={guitarc.id}
+                            img={guitarc.image}
+                            nombre={guitarc.name}
+                            precio={guitarc.price}
+                            cantidad={guitarc.quantity}
+                            aumentarCantidad={aumentarCantidad}
+                            quitarCantidad={quitarCantidad}
+                            quitarDelCarro={quitarDelCarro}
+                          />
+                        ))}
+                      </tbody>
+                    </table>
 
-                  <p className="text-end">
-                    Total pagar: <span className="fw-bold">$899</span>
-                  </p>
-                  <button className="btn btn-dark w-100 mt-3 p-2">
-                    Vaciar Carrito
-                  </button>
+                    <p className="text-end">
+                      Total pagar: <span className="fw-bold">${cartTotal()}</span>
+                    </p>
+                    
+                    <button 
+                      className="btn btn-dark w-100 mt-3 p-2"
+                      onClick={vaciarElCarro}
+                    >
+                      Vaciar Carrito
+                    </button>
+                  </>
+                  )}
                 </div>
               </div>
             </nav>
