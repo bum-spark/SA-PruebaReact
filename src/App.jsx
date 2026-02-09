@@ -7,7 +7,7 @@ import './App.css'
 //useState: Una variable va a estar renderizando cuando se utilice su metodo
 //useEffect: esperar un resultado y luego utilizar las variables
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { db } from './db/db.js'
 
 
@@ -41,7 +41,20 @@ function App() {
   }, [] );*/
   //Al momento que el db cambie, se va a ejecutar el useEffect
 
-  const [cart, setCart] = useState([]);
+  //const [cart, setCart] = useState([]);
+
+  //Se usa una funcion para inicializar el estado del carrito, de esta forma se puede recuperar el 
+  // carrito guardado en localStorage al cargar la aplicacion
+  const [cart, setCart] = useState(() => {
+    const carritoGuardado = localStorage.getItem('cart');
+    return carritoGuardado ? JSON.parse(carritoGuardado) : [];
+  });
+
+  //Cada vez que el carrito cambie, se guarda en localStorage 
+  // para mantener el estado del carrito entre sesiones
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
   const aumentarCantidad = (id) => {
     const updatedCart = cart.map(item => {
