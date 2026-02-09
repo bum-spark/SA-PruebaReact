@@ -1,6 +1,8 @@
 import React from 'react'
 
 import Item from './Item.jsx'
+import logoImg from '/img/logo.svg'
+import carritoImg from '/img/carrito.png'
 
 export default function Header({ guigui, aumentarCantidad, quitarCantidad, quitarDelCarro, vaciarElCarro }) {
 //logic here
@@ -28,7 +30,7 @@ console.log(guigui);
               <a href="index.html">
                 <img
                   className="img-fluid"
-                  src="/img/logo.svg"
+                  src={logoImg}
                   alt="imagen logo"
                 />
               </a>
@@ -37,7 +39,7 @@ console.log(guigui);
               <div className="carrito">
                 <img
                   className="img-fluid"
-                  src="/img/carrito.png"
+                  src={carritoImg}
                   alt="imagen carrito"
                 />
 
