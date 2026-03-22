@@ -1,98 +1,93 @@
 import Header from './Components/Header.jsx'
 import Card from './Components/Card.jsx'
 import Footer from './Components/Footer.jsx'
+import GuitarModal from './Components/GuitarModal.jsx'
 import './App.css'
-
-//import { useState, useEffect, useReducer } from 'react'
-//useState: Una variable va a estar renderizando cuando se utilice su metodo
-//useEffect: esperar un resultado y luego utilizar las variables
-
 import { useState, useEffect } from 'react'
-import { db } from './db/db.js'
-
+import { getGuitars, createGuitar, updateGuitar, deleteGuitar, toggleAvailability } from './services/guitarService.js'
 
 function App() {
-  //     variable   metodo para        valor inicial
-  //                actualizar 
-  //               la variable
-  /*const [customer, setCustomer] = useState({});
-  const [total, setTotal] = useState(0);
-  const [products, setProducts] = useState([]);
-  const [modal, setModal] = useState(false);
+  // ── Guitarras ──────────────────────────────────────────────
+  const [data, setData] = useState([])
 
-  ()=>setTotal(total + 1)*/
-  
-  /*if(auth){
-    const [modal, setModal] = useState(false);
-  }*/ 
-  //Esto no se puede hacer dentro de un condicional o ciclo, los hooks se deben definir al iniicio
+  const loadGuitars = () => {
+    getGuitars()
+      .then(guitars => setData(guitars))
+      .catch(err => console.error('Error cargando guitarras:', err))
+  }
 
-  /*console.log(customer);
-  console.log(total);
-  console.log(products);
-  console.log(modal);*/
+  useEffect(() => { loadGuitars() }, [])
 
-  const [data, setData] = useState(db);
+  // ── Modal (null = cerrado, null guitar = crear, objeto = editar) ─
+  const [modalOpen, setModalOpen]       = useState(false)
+  const [guitarToEdit, setGuitarToEdit] = useState(null)
 
-  //xconsole.log(data);
+  const openCreate = () => { setGuitarToEdit(null); setModalOpen(true) }
+  const openEdit   = (guitar) => { setGuitarToEdit(guitar); setModalOpen(true) }
+  const closeModal = () => setModalOpen(false)
 
-  /*useEffect( ()=> {
-    setData(db)
-  }, [] );*/
-  //Al momento que el db cambie, se va a ejecutar el useEffect
+  const handleSave = async (formData) => {
+    try {
+      if (guitarToEdit) {
+        await updateGuitar(guitarToEdit.id, formData)
+      } else {
+        await createGuitar(formData)
+      }
+      closeModal()
+      loadGuitars()
+    } catch (err) {
+      console.error('Error al guardar:', err)
+    }
+  }
 
-  //const [cart, setCart] = useState([]);
+  const handleDelete = async (id) => {
+    if (!window.confirm('¿Eliminar esta guitarra permanentemente?')) return
+    try {
+      await deleteGuitar(id)
+      loadGuitars()
+    } catch (err) {
+      console.error('Error al eliminar:', err)
+    }
+  }
 
-  //Se usa una funcion para inicializar el estado del carrito, de esta forma se puede recuperar el 
-  // carrito guardado en localStorage al cargar la aplicacion
+  const handleToggle = async (id) => {
+    try {
+      await toggleAvailability(id)
+      loadGuitars()
+    } catch (err) {
+      console.error('Error al cambiar disponibilidad:', err)
+    }
+  }
+
+  // ── Carrito ────────────────────────────────────────────────
   const [cart, setCart] = useState(() => {
-    const carritoGuardado = localStorage.getItem('cart');
-    return carritoGuardado ? JSON.parse(carritoGuardado) : [];
-  });
+    const saved = localStorage.getItem('cart')
+    return saved ? JSON.parse(saved) : []
+  })
 
-  //Cada vez que el carrito cambie, se guarda en localStorage 
-  // para mantener el estado del carrito entre sesiones
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
+    localStorage.setItem('cart', JSON.stringify(cart))
+  }, [cart])
 
   const aumentarCantidad = (id) => {
-    const updatedCart = cart.map(item => {
-      if (item.id === id) {
-        return { ...item, quantity: item.quantity + 1 };
-      }
-      return item;
-    });
-    setCart(updatedCart);
-  };
+    setCart(cart.map(item => item.id === id ? { ...item, quantity: item.quantity + 1 } : item))
+  }
 
   const quitarCantidad = (id) => {
-    const item = cart.find(item => item.id === id);
+    const item = cart.find(item => item.id === id)
     if (item.quantity === 1) {
-      quitarDelCarro(id);
+      quitarDelCarro(id)
     } else {
-      const updatedCart = cart.map(item => {
-        if (item.id === id) {
-          return { ...item, quantity: item.quantity - 1 };
-        }
-        return item;
-      });
-      setCart(updatedCart);
+      setCart(cart.map(item => item.id === id ? { ...item, quantity: item.quantity - 1 } : item))
     }
-  };
+  }
 
-  const quitarDelCarro = (id) => {
-    const updatedCart = cart.filter(item => item.id !== id);
-    setCart(updatedCart);
-  };
-
-  const vaciarElCarro = () => {
-    setCart([]);
-  };
+  const quitarDelCarro = (id) => setCart(cart.filter(item => item.id !== id))
+  const vaciarElCarro  = () => setCart([])
 
   return (
     <div>
-      <Header 
+      <Header
         guigui={cart}
         aumentarCantidad={aumentarCantidad}
         quitarCantidad={quitarCantidad}
@@ -101,28 +96,44 @@ function App() {
       />
 
       <main className="container-xl mt-5">
-        <h2 className="text-center">Nuestra Colección</h2>
+        <div className="d-flex justify-content-between align-items-center">
+          <h2 className="text-center">Nuestra Colección</h2>
+          <button
+            className="btn btn-dark"
+            onClick={openCreate}
+            title="Agregar nueva guitarra"
+          >
+            ➕ Nueva Guitarra
+          </button>
+        </div>
+
         <div className="row mt-5">
-
-          {data.map(
-            (guitar) => (
-              <Card
-                key={guitar.id}
-                guitar={guitar}
-                cart={cart}
-                setCart={setCart}
-              />
-            ) 
-          )}
-
+          {data.map(guitar => (
+            <Card
+              key={guitar.id}
+              guitar={guitar}
+              cart={cart}
+              setCart={setCart}
+              onEdit={openEdit}
+              onDelete={handleDelete}
+              onToggle={handleToggle}
+            />
+          ))}
         </div>
       </main>
 
       <Footer/>
 
+      {modalOpen && (
+        <GuitarModal
+          guitar={guitarToEdit}
+          onSave={handleSave}
+          onClose={closeModal}
+        />
+      )}
     </div>
-
   )
 }
 
 export default App
+
